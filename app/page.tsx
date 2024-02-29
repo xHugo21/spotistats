@@ -11,70 +11,39 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { generateRandomString, sha256, base64encode } from "../lib/auth";
-import { useEffect } from "react";
+import { SPOTIFY_CLIENT_ID, SPOTIFY_REDIRECT_URI } from "../lib/config";
+import { generateRandomString, sha256, base64encode } from "../lib/pkce.js";
 
 export default function Home() {
-  const clientId = "_REMOVED";
-  const redirectUri = "http://localhost:3000/";
+  const handleLogin = () => {
+    const authEndpoint = "https://accounts.spotify.com/authorize";
+    const clientId = SPOTIFY_CLIENT_ID;
+    const redirectUri = SPOTIFY_REDIRECT_URI;
+    const responseType = "code";
+    const scope = "user-read-private user-read-email"; // Add additional scopes if needed
 
-  const scope = "user-read-private user-read-email";
-  const authUrl = new URL("https://accounts.spotify.com/authorize");
+    const codeChallengeMethod = "S256"; // PKCE
+    const codeVerifier = generateRandomString(32); // Generate a random string
+    localStorage.setItem("codeVerifier", codeVerifier);
+    const hashed = async () => await sha256(codeVerifier);
+    const codeChallenge = base64encode(hashed);
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (!localStorage.getItem("code_verifier")) {
-      const codeVerifier = generateRandomString(64);
-      const hashed = async () => await sha256(codeVerifier);
-      const codeChallenge = base64encode(hashed);
-
-      window.localStorage.setItem("code_verifier", codeVerifier);
-
-      const params = {
-        response_type: "code",
-        client_id: clientId,
-        scope,
-        code_challenge_method: "S256",
-        code_challenge: codeChallenge,
-        redirect_uri: redirectUri,
-      };
-
-      authUrl.search = new URLSearchParams(params).toString();
-      window.location.href = authUrl.toString();
-    } else if (urlParams.get("code")) {
-      const code = urlParams.get("code");
-
-      getToken(code);
-    } else if (urlParams.get("error")) {
-      alert("Error when trying to log in using Spotify Authorization");
-    }
-  });
-  let timeInterval: string = "4w"; // TODO: manage on value change DropdownRadioGroup
-
-  const getToken = async (code: any) => {
-    let codeVerifier = localStorage.getItem("code_verifier");
-
-    const url = "https://accounts.spotify.com/api/token";
-
-    const payload = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        client_id: clientId,
-        grant_type: "authorization_code",
-        code,
-        redirect_uri: redirectUri,
-        code_verifier: codeVerifier ?? "",
-      }),
+    const queryParams = {
+      client_id: clientId,
+      response_type: responseType,
+      redirect_uri: redirectUri,
+      scope: scope,
+      code_challenge_method: codeChallengeMethod,
+      code_challenge: codeChallenge,
     };
 
-    const body = await fetch(url, payload);
-    const response = await body.json();
+    const queryString = new URLSearchParams(queryParams).toString();
+    const authUrl = `${authEndpoint}?${queryString}`;
 
-    localStorage.setItem("access_token", response.access_token);
+    window.location.href = authUrl;
   };
+
+  let timeInterval = "4w";
 
   return (
     <main className="p-24">
@@ -93,7 +62,7 @@ export default function Home() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button>Login</Button>
+      <Button onClick={handleLogin}>Login</Button>
     </main>
   );
 }
