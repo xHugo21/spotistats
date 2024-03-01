@@ -26,7 +26,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "lib/pkce.js"
+    "lib/pkce-utils.js"
   ],
   "exclude": ["node_modules"]
 }

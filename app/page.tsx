@@ -12,57 +12,67 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { SPOTIFY_CLIENT_ID, SPOTIFY_REDIRECT_URI } from "../lib/config";
-import { generateRandomString, sha256, base64encode } from "../lib/pkce.js";
+import {
+  generateRandomString,
+  generateCodeChallenge,
+  generateUrlWithSearchParams,
+} from "../lib/pkce-utils.js";
 
 export default function Home() {
   const handleLogin = () => {
-    const authEndpoint = "https://accounts.spotify.com/authorize";
-    const clientId = SPOTIFY_CLIENT_ID;
-    const redirectUri = SPOTIFY_REDIRECT_URI;
-    const responseType = "code";
-    const scope = "user-read-private user-read-email"; // Add additional scopes if needed
+    const codeVerifier = generateRandomString(64);
 
-    const codeChallengeMethod = "S256"; // PKCE
-    const codeVerifier = generateRandomString(32); // Generate a random string
-    localStorage.setItem("codeVerifier", codeVerifier);
-    const hashed = async () => await sha256(codeVerifier);
-    const codeChallenge = base64encode(hashed);
+    generateCodeChallenge(codeVerifier).then((code_challenge) => {
+      window.localStorage.setItem("code_verifier", codeVerifier);
 
-    const queryParams = {
-      client_id: clientId,
-      response_type: responseType,
-      redirect_uri: redirectUri,
-      scope: scope,
-      code_challenge_method: codeChallengeMethod,
-      code_challenge: codeChallenge,
-    };
-
-    const queryString = new URLSearchParams(queryParams).toString();
-    const authUrl = `${authEndpoint}?${queryString}`;
-
-    window.location.href = authUrl;
+      window.location.href = generateUrlWithSearchParams(
+        "https://accounts.spotify.com/authorize",
+        {
+          response_type: "code",
+          client_id: SPOTIFY_CLIENT_ID,
+          scope: "user-read-private user-read-email",
+          code_challenge_method: "S256",
+          code_challenge,
+          redirect_uri: SPOTIFY_REDIRECT_URI,
+        }
+      );
+    });
   };
 
   let timeInterval = "4w";
+  let access_token = localStorage.getItem("access_token");
 
   return (
-    <main className="p-24">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline">Time Interval</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56">
-          <DropdownMenuLabel>Select One</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuRadioGroup value={timeInterval}>
-            <DropdownMenuRadioItem value="4w">4 weeks</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="6m">6 months</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="at">All Time</DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <main className="p-24 flex justify-center flex-col items-center">
+      <h1 className="text-4xl font-bold mb-4">Spotify Stats</h1>
 
-      <Button onClick={handleLogin}>Login</Button>
+      <div className="flex w-full justify-between">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">Time Interval</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuLabel>Select One</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuRadioGroup value={timeInterval}>
+              <DropdownMenuRadioItem value="4w">4 weeks</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="6m">6 months</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="at">All Time</DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <div className="flex gap-4">
+          <Button onClick={handleLogin}>Login</Button>
+          {access_token && (
+            <div className="bg-green-400 rounded-md p-2">Logged in</div>
+          )}
+        </div>
+      </div>
+
+      <div className="bg-slate-500 p-4 rounded-md">
+        <span>Access Token: {access_token}</span>
+      </div>
     </main>
   );
 }
