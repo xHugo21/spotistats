@@ -30,6 +30,7 @@ const Callback = () => {
           // Save tokens in localStorage
           localStorage.setItem("access_token", data.access_token);
           localStorage.setItem("refresh_token", data.refresh_token);
+          localStorage.setItem("expires_at", data.expires_at);
           localStorage.removeItem("code_verifier");
 
           // Get back to the home page

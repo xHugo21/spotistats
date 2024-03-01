@@ -17,8 +17,18 @@ import {
   generateCodeChallenge,
   generateUrlWithSearchParams,
 } from "../lib/pkce-utils.js";
+import { useState, useEffect } from "react";
+import Image from "next/image";
 
 export default function Home() {
+  const [userData, setUserData] = useState<any>(null);
+
+  useEffect(() => {
+    if (localStorage.getItem("access_token")) {
+      getUserData(localStorage.getItem("access_token"));
+    }
+  }, []);
+
   const handleLogin = () => {
     const codeVerifier = generateRandomString(64);
 
@@ -37,6 +47,33 @@ export default function Home() {
         }
       );
     });
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/";
+  };
+
+  const getUserData = (access_token: string | null) => {
+    fetch("https://api.spotify.com/v1/me", {
+      headers: {
+        Authorization: "Bearer " + access_token,
+      },
+    })
+      .then(async (response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw await response.json();
+        }
+      })
+      .then((data) => {
+        setUserData(data);
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   let timeInterval = "4w";
@@ -62,16 +99,24 @@ export default function Home() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <div className="flex gap-4">
-          <Button onClick={handleLogin}>Login</Button>
-          {access_token && (
-            <div className="bg-green-400 rounded-md p-2">Logged in</div>
+        <div className="flex flex-col gap-4">
+          {!access_token && <Button onClick={handleLogin}>Login</Button>}
+          {access_token && userData && (
+            <>
+              <Button onClick={handleLogout}>Logout</Button>
+              <div className="flex flex-col items-center">
+                <Image
+                  width="100"
+                  height="100"
+                  src={userData.images[0].url}
+                  alt="User Profile"
+                />
+                <p className="text-lg font-bold">{userData.display_name}</p>
+                <p className="text-lg">{userData.id}</p>
+              </div>
+            </>
           )}
         </div>
-      </div>
-
-      <div className="bg-slate-500 p-4 rounded-md">
-        <span>Access Token: {access_token}</span>
       </div>
     </main>
   );
