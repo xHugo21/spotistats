@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "../components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +9,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "../components/ui/dropdown-menu";
 
 import { SPOTIFY_CLIENT_ID, SPOTIFY_REDIRECT_URI } from "../lib/config";
 import {
@@ -19,14 +19,19 @@ import {
 } from "../lib/pkce-utils.js";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { get } from "http";
 
 export default function Home() {
+  const [timeInterval, setTimeInterval] = useState<any>(null);
+  const [topType, setTopType] = useState<any>(null);
   const [userData, setUserData] = useState<any>(null);
   const [userTopArtists, setUserTopArtists] = useState<any>(null);
 
   useEffect(() => {
     if (localStorage.getItem("access_token")) {
       getUserData(localStorage.getItem("access_token"));
+      setTimeInterval("short_term");
+      setTopType("tracks");
     }
   }, []);
 
@@ -79,11 +84,10 @@ export default function Home() {
 
   const getTopItems = () => {
     fetch(
-      "https://api.spotify.com/v1/me/top/artists?" +
+      `https://api.spotify.com/v1/me/top/${topType}?` +
         new URLSearchParams({
-          time_range: "medium_term",
-          limit: "10",
-          offset: "5",
+          time_range: timeInterval,
+          limit: "20",
         }),
       {
         headers: {
@@ -107,7 +111,6 @@ export default function Home() {
       });
   };
 
-  let timeInterval = "4w";
   let access_token = localStorage.getItem("access_token");
 
   return (
@@ -115,20 +118,52 @@ export default function Home() {
       <h1 className="text-4xl font-bold mb-4">Spotify Stats</h1>
 
       <div className="flex w-full justify-between">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">Time Interval</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            <DropdownMenuLabel>Select One</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuRadioGroup value={timeInterval}>
-              <DropdownMenuRadioItem value="4w">4 weeks</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="6m">6 months</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="at">All Time</DropdownMenuRadioItem>
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex flex-col gap-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">Type</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>Select One</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={topType}
+                onValueChange={setTopType}
+              >
+                <DropdownMenuRadioItem value="artists">
+                  Tracks
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="tracks">
+                  Artists
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">Time Interval</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>Select One</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={timeInterval}
+                onValueChange={setTimeInterval}
+              >
+                <DropdownMenuRadioItem value="short_term">
+                  4 weeks
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="medium_term">
+                  6 months
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="long_term">
+                  All Time
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
 
         <div className="flex flex-col gap-4">
           {!access_token && <Button onClick={handleLogin}>Login</Button>}
