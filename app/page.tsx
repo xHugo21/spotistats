@@ -123,7 +123,7 @@ export default function Home() {
         <span className="text-customprim">Hugo&apos;s</span> Spotify Stats
       </h1>
 
-      <div className="flex w-full justify-center">
+      <div className="flex w-full justify-between mt-8">
         <div className="flex flex-col gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -134,7 +134,10 @@ export default function Home() {
               <DropdownMenuSeparator />
               <DropdownMenuRadioGroup
                 value={topType}
-                onValueChange={setTopType}
+                onValueChange={(value) => {
+                  setTopType(value);
+                  getTopItems();
+                }}
               >
                 <DropdownMenuRadioItem value="tracks">
                   Tracks
@@ -155,7 +158,10 @@ export default function Home() {
               <DropdownMenuSeparator />
               <DropdownMenuRadioGroup
                 value={timeInterval}
-                onValueChange={setTimeInterval}
+                onValueChange={(value) => {
+                  setTimeInterval(value);
+                  getTopItems();
+                }}
               >
                 <DropdownMenuRadioItem value="short_term">
                   4 weeks
@@ -169,39 +175,6 @@ export default function Home() {
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-64 gap-y-8 mt-8">
-          {userTopTracks &&
-            userTopTracks.items.map((track: any) => {
-              return (
-                <div key={track.id} className="flex items-center gap-4">
-                  <Image
-                    className="aspect-square object-cover rounded-lg"
-                    width="100"
-                    height="100"
-                    src={track.album.images[0].url}
-                    alt={track.name}
-                  />
-                  <p className="font-bold">{track.name}</p>
-                </div>
-              );
-            })}
-          {userTopArtists &&
-            userTopArtists.items.map((artist: any) => {
-              return (
-                <div key={artist.id} className="flex items-center gap-4">
-                  <Image
-                    className="aspect-square object-cover rounded-lg"
-                    width="100"
-                    height="100"
-                    src={artist.images[0].url}
-                    alt={artist.name}
-                  />
-                  <p className="font-bold">{artist.name}</p>
-                </div>
-              );
-            })}
         </div>
 
         <div className="flex flex-col gap-4">
@@ -224,7 +197,38 @@ export default function Home() {
         </div>
       </div>
 
-      <Button onClick={getTopItems}>Get Top Items</Button>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-64 gap-y-8 mt-8">
+        {userTopTracks &&
+          userTopTracks.items.map((track: any) => {
+            return (
+              <div key={track.id} className="flex items-center gap-4">
+                <Image
+                  className="aspect-square object-cover rounded-lg"
+                  width="100"
+                  height="100"
+                  src={track.album.images[0].url}
+                  alt={track.name}
+                />
+                <p className="font-bold">{track.name}</p>
+              </div>
+            );
+          })}
+        {userTopArtists &&
+          userTopArtists.items.map((artist: any) => {
+            return (
+              <div key={artist.id} className="flex items-center gap-4">
+                <Image
+                  className="aspect-square object-cover rounded-lg"
+                  width="100"
+                  height="100"
+                  src={artist.images[0].url}
+                  alt={artist.name}
+                />
+                <p className="font-bold">{artist.name}</p>
+              </div>
+            );
+          })}
+      </div>
     </main>
   );
 }
