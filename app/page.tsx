@@ -19,13 +19,13 @@ import {
 } from "../lib/pkce-utils.js";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { get } from "http";
 
 export default function Home() {
   const [timeInterval, setTimeInterval] = useState<any>(null);
   const [topType, setTopType] = useState<any>(null);
   const [userData, setUserData] = useState<any>(null);
   const [userTopArtists, setUserTopArtists] = useState<any>(null);
+  const [userTopTracks, setUserTopTracks] = useState<any>(null);
 
   useEffect(() => {
     if (localStorage.getItem("access_token")) {
@@ -75,7 +75,6 @@ export default function Home() {
       })
       .then((data) => {
         setUserData(data);
-        console.log(data);
       })
       .catch((error) => {
         console.error(error);
@@ -103,8 +102,13 @@ export default function Home() {
         }
       })
       .then((data) => {
-        setUserTopArtists(data);
-        console.log(data);
+        if (topType === "tracks") {
+          setUserTopArtists(null);
+          setUserTopTracks(data);
+        } else {
+          setUserTopTracks(null);
+          setUserTopArtists(data);
+        }
       })
       .catch((error) => {
         console.error(error);
@@ -114,10 +118,12 @@ export default function Home() {
   let access_token = localStorage.getItem("access_token");
 
   return (
-    <main className="p-24 flex justify-center flex-col items-center">
-      <h1 className="text-4xl font-bold mb-4">Spotify Stats</h1>
+    <main className="py-24 px-32 flex justify-center flex-col items-center">
+      <h1 className="text-6xl font-bold mb-4">
+        <span className="text-customprim">Hugo&apos;s</span> Spotify Stats
+      </h1>
 
-      <div className="flex w-full justify-between">
+      <div className="flex w-full justify-center">
         <div className="flex flex-col gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -130,10 +136,10 @@ export default function Home() {
                 value={topType}
                 onValueChange={setTopType}
               >
-                <DropdownMenuRadioItem value="artists">
+                <DropdownMenuRadioItem value="tracks">
                   Tracks
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="tracks">
+                <DropdownMenuRadioItem value="artists">
                   Artists
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
@@ -165,6 +171,39 @@ export default function Home() {
           </DropdownMenu>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-64 gap-y-8 mt-8">
+          {userTopTracks &&
+            userTopTracks.items.map((track: any) => {
+              return (
+                <div key={track.id} className="flex items-center gap-4">
+                  <Image
+                    className="aspect-square object-cover rounded-lg"
+                    width="100"
+                    height="100"
+                    src={track.album.images[0].url}
+                    alt={track.name}
+                  />
+                  <p className="font-bold">{track.name}</p>
+                </div>
+              );
+            })}
+          {userTopArtists &&
+            userTopArtists.items.map((artist: any) => {
+              return (
+                <div key={artist.id} className="flex items-center gap-4">
+                  <Image
+                    className="aspect-square object-cover rounded-lg"
+                    width="100"
+                    height="100"
+                    src={artist.images[0].url}
+                    alt={artist.name}
+                  />
+                  <p className="font-bold">{artist.name}</p>
+                </div>
+              );
+            })}
+        </div>
+
         <div className="flex flex-col gap-4">
           {!access_token && <Button onClick={handleLogin}>Login</Button>}
           {access_token && userData && (
@@ -186,25 +225,6 @@ export default function Home() {
       </div>
 
       <Button onClick={getTopItems}>Get Top Items</Button>
-
-      <div className="flex flex-col gap-4 mt-8">
-        <p className="text-lg font-bold">Top Artists</p>
-        {userTopArtists &&
-          userTopArtists.items.map((artist: any) => {
-            return (
-              <div key={artist.id} className="flex items-center gap-4">
-                <Image
-                  className="aspect-square object-cover rounded-lg"
-                  width="100"
-                  height="100"
-                  src={artist.images[0].url}
-                  alt={artist.name}
-                />
-                <p>{artist.name}</p>
-              </div>
-            );
-          })}
-      </div>
     </main>
   );
 }
