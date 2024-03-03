@@ -10,6 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
+import { Artist } from "../components/Artist";
+import { Track } from "../components/Track";
+import { User } from "../components/User";
 
 import { SPOTIFY_CLIENT_ID, SPOTIFY_REDIRECT_URI } from "../lib/config";
 import {
@@ -18,7 +21,6 @@ import {
   generateUrlWithSearchParams,
 } from "../lib/pkce-utils.js";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 
 export default function Home() {
   const [timeInterval, setTimeInterval] = useState<any>(null);
@@ -54,11 +56,6 @@ export default function Home() {
         }
       );
     });
-  };
-
-  const handleLogout = () => {
-    localStorage.clear();
-    window.location.href = "/";
   };
 
   const getUserData = (access_token: string | null) => {
@@ -158,16 +155,6 @@ export default function Home() {
       });
   };
 
-  const parseFollowers = (followers: number): string => {
-    if (followers >= 1000000) {
-      return `${(followers / 1000000).toFixed(1)}M`;
-    }
-    if (followers >= 1000) {
-      return `${(followers / 1000).toFixed(1)}K`;
-    }
-    return followers.toString();
-  };
-
   let access_token = localStorage.getItem("access_token");
 
   return (
@@ -236,23 +223,7 @@ export default function Home() {
               Login
             </Button>
           )}
-          {access_token && userData && (
-            <>
-              <Button className="w-32" onClick={handleLogout}>
-                Logout
-              </Button>
-              <div className="flex flex-col items-center gap-4">
-                <Image
-                  width="100"
-                  height="100"
-                  src={userData.images[0].url}
-                  alt="User Profile"
-                  className="rounded-lg"
-                />
-                <p className="text-lg font-bold">{userData.display_name}</p>
-              </div>
-            </>
-          )}
+          {access_token && userData && <User userData={userData} />}
         </div>
       </div>
 
@@ -260,69 +231,11 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-32 gap-y-8 mt-8">
           {userTopTracks &&
             userTopTracks.items.map((track: any, index: number) => {
-              return (
-                <div key={track.id} className="flex items-center gap-4">
-                  <p className="font-bold text-customprim">{index + 1}</p>
-                  <a href={track.external_urls.spotify} target="_blank">
-                    <Image
-                      className="aspect-square object-cover rounded-lg"
-                      width="100"
-                      height="100"
-                      src={track.album.images[0].url}
-                      alt={track.name}
-                    />
-                  </a>
-                  <div className="flex flex-col gap-2">
-                    <p className="font-bold">{track.name}</p>
-                    <div className="flex flex-wrap gap-1 w-40">
-                      {track.artists.map((artist: any, artistIndex: number) => {
-                        return (
-                          <p key={artist.id} className="text-sm">
-                            {artist.name}
-                            {artistIndex !== track.artists.length - 1 && ","}
-                          </p>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              );
+              return <Track key={track.id} track={track} index={index} />;
             })}
           {userTopArtists &&
             userTopArtists.items.map((artist: any, index: number) => {
-              return (
-                <div key={artist.id} className="flex items-center gap-4">
-                  <p className="font-bold text-customprim">{index + 1}</p>
-                  <a href={artist.external_urls.spotify} target="_blank">
-                    <Image
-                      className="aspect-square object-cover rounded-lg"
-                      width="100"
-                      height="100"
-                      src={artist.images[0].url}
-                      alt={artist.name}
-                    />
-                  </a>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex gap-2">
-                      <p className="font-bold">{artist.name}</p>
-                      <div className="flex gap-1 items-center">
-                        <Image
-                          src="assets/bolt.svg"
-                          alt="Bolt icon"
-                          width="16"
-                          height="16"
-                        />
-                        <p className="text-customacc font-bold">
-                          {artist.popularity}
-                        </p>
-                      </div>
-                    </div>
-                    <p className="text-sm">
-                      {parseFollowers(artist.followers.total)} followers
-                    </p>
-                  </div>
-                </div>
-              );
+              return <Artist key={artist.id} artist={artist} index={index} />;
             })}
         </div>
         {(userTopTracks || userTopArtists) && (
