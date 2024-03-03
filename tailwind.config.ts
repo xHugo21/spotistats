@@ -22,7 +22,6 @@ const config = {
         customprim: "#c1c651",
         customsec: "#e1e49a",
         customacc: "#dbdf6b",
-        customback: "#fbfbf5",
         customtext: "#0c0d06",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
