@@ -2,14 +2,12 @@
 
 import { Button } from "../components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Artist } from "../components/Artist";
 import { Track } from "../components/Track";
 import { User } from "../components/User";
@@ -23,20 +21,12 @@ import {
 import { useState, useEffect } from "react";
 
 export default function Home() {
+  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [timeInterval, setTimeInterval] = useState<any>(null);
   const [topType, setTopType] = useState<any>(null);
   const [userData, setUserData] = useState<any>(null);
   const [userTopArtists, setUserTopArtists] = useState<any>(null);
   const [userTopTracks, setUserTopTracks] = useState<any>(null);
-
-  useEffect(() => {
-    if (localStorage.getItem("access_token")) {
-      getUserData(localStorage.getItem("access_token"));
-      setTimeInterval("short_term");
-      setTopType("tracks");
-      getTopItems();
-    }
-  }, []);
 
   const handleLogin = () => {
     const codeVerifier = generateRandomString(64);
@@ -81,40 +71,6 @@ export default function Home() {
       });
   };
 
-  const getTopItems = () => {
-    fetch(
-      `https://api.spotify.com/v1/me/top/${topType}?` +
-        new URLSearchParams({
-          time_range: timeInterval,
-          limit: "20",
-        }),
-      {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("access_token"),
-        },
-      }
-    )
-      .then(async (response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw await response.json();
-        }
-      })
-      .then((data) => {
-        if (topType === "tracks") {
-          setUserTopArtists(null);
-          setUserTopTracks(data);
-        } else {
-          setUserTopTracks(null);
-          setUserTopArtists(data);
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  };
-
   const getMoreItems = () => {
     fetch(
       `https://api.spotify.com/v1/me/top/${topType}?` +
@@ -155,62 +111,76 @@ export default function Home() {
       });
   };
 
-  let access_token = localStorage.getItem("access_token");
+  useEffect(() => {
+    function getTopItems() {
+      fetch(
+        `https://api.spotify.com/v1/me/top/${topType}?` +
+          new URLSearchParams({
+            time_range: timeInterval,
+            limit: "20",
+          }),
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("access_token"),
+          },
+        }
+      )
+        .then(async (response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw await response.json();
+          }
+        })
+        .then((data) => {
+          if (topType === "tracks") {
+            setUserTopArtists(null);
+            setUserTopTracks(data);
+          } else {
+            setUserTopTracks(null);
+            setUserTopArtists(data);
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+
+    setAccessToken(localStorage.getItem("access_token"));
+
+    if (accessToken) {
+      getUserData(accessToken);
+    }
+
+    if (accessToken && topType && timeInterval) {
+      getTopItems();
+    }
+  }, [accessToken, topType, timeInterval]);
 
   return (
     <main className="py-8 px-16 md:py-16 md:px-28 flex justify-center flex-col items-center">
-      <div className="flex flex-col gap-8 md:flex-row md:gap-32 justify-between mt-8">
-        <div className="flex flex-col gap-4 items-center order-2 md:order-1">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild className="w-32">
-              <Button variant="outline">Type</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Select One</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuRadioGroup
-                value={topType}
-                onValueChange={(value) => {
-                  setTopType(value);
-                  getTopItems();
-                }}
-              >
-                <DropdownMenuRadioItem value="tracks">
-                  Tracks
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="artists">
-                  Artists
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+      <div className="flex flex-col gap-8 md:flex-row md:gap-16 justify-around items-center w-full">
+        <div className="flex md:flex-col gap-4 items-center order-2 md:order-1">
+          <Select onValueChange={setTopType}>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="tracks">Tracks</SelectItem>
+              <SelectItem value="artists">Artists</SelectItem>
+            </SelectContent>
+          </Select>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild className="w-32">
-              <Button variant="outline">Time Interval</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Select One</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuRadioGroup
-                value={timeInterval}
-                onValueChange={(value) => {
-                  setTimeInterval(value);
-                  getTopItems();
-                }}
-              >
-                <DropdownMenuRadioItem value="short_term">
-                  4 weeks
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="medium_term">
-                  6 months
-                </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="long_term">
-                  All Time
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Select onValueChange={setTimeInterval}>
+            <SelectTrigger className="w-32">
+              <SelectValue placeholder="Time Interval" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="short_term">4 Weeks</SelectItem>
+              <SelectItem value="medium_term">6 Months</SelectItem>
+              <SelectItem value="long_term">All Time</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <h1 className="text-6xl font-bold mb-4 text-center order-1 md:order-2">
@@ -218,32 +188,30 @@ export default function Home() {
         </h1>
 
         <div className="flex flex-col gap-4 items-center order-3">
-          {!access_token && (
+          {!accessToken && (
             <Button className="w-32" onClick={handleLogin}>
               Login
             </Button>
           )}
-          {access_token && userData && <User userData={userData} />}
+          {accessToken && userData && <User userData={userData} />}
         </div>
       </div>
 
-      <div className="flex flex-col gap-8 items-center">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-32 gap-y-8 mt-8">
-          {userTopTracks &&
-            userTopTracks.items.map((track: any, index: number) => {
-              return <Track key={track.id} track={track} index={index} />;
-            })}
-          {userTopArtists &&
-            userTopArtists.items.map((artist: any, index: number) => {
-              return <Artist key={artist.id} artist={artist} index={index} />;
-            })}
-        </div>
-        {(userTopTracks || userTopArtists) && (
-          <Button className="w-32" onClick={getMoreItems}>
-            Load More
-          </Button>
-        )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-32 gap-y-8 mt-16">
+        {userTopTracks &&
+          userTopTracks.items.map((track: any, index: number) => {
+            return <Track key={track.id} track={track} index={index} />;
+          })}
+        {userTopArtists &&
+          userTopArtists.items.map((artist: any, index: number) => {
+            return <Artist key={artist.id} artist={artist} index={index} />;
+          })}
       </div>
+      {(userTopTracks || userTopArtists) && (
+        <Button className="w-32 mt-16" onClick={getMoreItems}>
+          Load More
+        </Button>
+      )}
     </main>
   );
 }
