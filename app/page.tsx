@@ -158,6 +158,16 @@ export default function Home() {
       });
   };
 
+  const parseFollowers = (followers: number): string => {
+    if (followers >= 1000000) {
+      return `${(followers / 1000000).toFixed(1)}M`;
+    }
+    if (followers >= 1000) {
+      return `${(followers / 1000).toFixed(1)}K`;
+    }
+    return followers.toString();
+  };
+
   let access_token = localStorage.getItem("access_token");
 
   return (
@@ -246,7 +256,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-8 items-center">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-32 gap-y-8 mt-8">
           {userTopTracks &&
             userTopTracks.items.map((track: any, index: number) => {
@@ -293,9 +303,22 @@ export default function Home() {
                     />
                   </a>
                   <div className="flex flex-col gap-2">
-                    <p className="font-bold">{artist.name}</p>
+                    <div className="flex gap-2">
+                      <p className="font-bold">{artist.name}</p>
+                      <div className="flex gap-1 items-center">
+                        <Image
+                          src="assets/bolt.svg"
+                          alt="Bolt icon"
+                          width="16"
+                          height="16"
+                        />
+                        <p className="text-customacc font-bold">
+                          {artist.popularity}
+                        </p>
+                      </div>
+                    </div>
                     <p className="text-sm">
-                      {artist.followers.total} followers
+                      {parseFollowers(artist.followers.total)} followers
                     </p>
                   </div>
                 </div>
@@ -303,7 +326,9 @@ export default function Home() {
             })}
         </div>
         {(userTopTracks || userTopArtists) && (
-          <Button onClick={getMoreItems}>Load More</Button>
+          <Button className="w-32" onClick={getMoreItems}>
+            Load More
+          </Button>
         )}
       </div>
     </main>
