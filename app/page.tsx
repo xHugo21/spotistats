@@ -118,12 +118,52 @@ export default function Home() {
       });
   };
 
+  const getMoreItems = () => {
+    fetch(
+      `https://api.spotify.com/v1/me/top/${topType}?` +
+        new URLSearchParams({
+          time_range: timeInterval,
+          limit: "20",
+          offset:
+            topType === "tracks"
+              ? userTopTracks.items.length
+              : userTopArtists.items.length,
+        }),
+      {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("access_token"),
+        },
+      }
+    )
+      .then(async (response) => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw await response.json();
+        }
+      })
+      .then((data) => {
+        if (topType === "tracks") {
+          setUserTopTracks({
+            items: userTopTracks.items.concat(data.items),
+          });
+        } else {
+          setUserTopArtists({
+            items: userTopArtists.items.concat(data.items),
+          });
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   let access_token = localStorage.getItem("access_token");
 
   return (
     <main className="py-8 px-16 md:py-16 md:px-28 flex justify-center flex-col items-center">
       <div className="flex flex-col gap-8 md:flex-row md:gap-32 justify-between mt-8">
-        <div className="flex flex-col gap-4 items-center">
+        <div className="flex flex-col gap-4 items-center order-2 md:order-1">
           <DropdownMenu>
             <DropdownMenuTrigger asChild className="w-32">
               <Button variant="outline">Type</Button>
@@ -176,11 +216,11 @@ export default function Home() {
           </DropdownMenu>
         </div>
 
-        <h1 className="text-6xl font-bold mb-4 text-center">
+        <h1 className="text-6xl font-bold mb-4 text-center order-1 md:order-2">
           <span className="text-customprim">Hugo&apos;s</span> Spotify Stats
         </h1>
 
-        <div className="flex flex-col gap-4 items-center">
+        <div className="flex flex-col gap-4 items-center order-3">
           {!access_token && (
             <Button className="w-32" onClick={handleLogin}>
               Login
@@ -206,58 +246,65 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-32 gap-y-8 mt-8">
-        {userTopTracks &&
-          userTopTracks.items.map((track: any, index: number) => {
-            return (
-              <div key={track.id} className="flex items-center gap-4">
-                <p className="font-bold text-customprim">{index + 1}</p>
-                <a href={track.external_urls.spotify} target="_blank">
-                  <Image
-                    className="aspect-square object-cover rounded-lg"
-                    width="100"
-                    height="100"
-                    src={track.album.images[0].url}
-                    alt={track.name}
-                  />
-                </a>
-                <div className="flex flex-col gap-2">
-                  <p className="font-bold">{track.name}</p>
-                  <div className="flex flex-wrap gap-1 w-40">
-                    {track.artists.map((artist: any, artistIndex: number) => {
-                      return (
-                        <p key={artist.id} className="text-sm">
-                          {artist.name}
-                          {artistIndex !== track.artists.length - 1 && ","}
-                        </p>
-                      );
-                    })}
+      <div className="flex flex-col gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-32 gap-y-8 mt-8">
+          {userTopTracks &&
+            userTopTracks.items.map((track: any, index: number) => {
+              return (
+                <div key={track.id} className="flex items-center gap-4">
+                  <p className="font-bold text-customprim">{index + 1}</p>
+                  <a href={track.external_urls.spotify} target="_blank">
+                    <Image
+                      className="aspect-square object-cover rounded-lg"
+                      width="100"
+                      height="100"
+                      src={track.album.images[0].url}
+                      alt={track.name}
+                    />
+                  </a>
+                  <div className="flex flex-col gap-2">
+                    <p className="font-bold">{track.name}</p>
+                    <div className="flex flex-wrap gap-1 w-40">
+                      {track.artists.map((artist: any, artistIndex: number) => {
+                        return (
+                          <p key={artist.id} className="text-sm">
+                            {artist.name}
+                            {artistIndex !== track.artists.length - 1 && ","}
+                          </p>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        {userTopArtists &&
-          userTopArtists.items.map((artist: any, index: number) => {
-            return (
-              <div key={artist.id} className="flex items-center gap-4">
-                <p className="font-bold text-customprim">{index + 1}</p>
-                <a href={artist.external_urls.spotify} target="_blank">
-                  <Image
-                    className="aspect-square object-cover rounded-lg"
-                    width="100"
-                    height="100"
-                    src={artist.images[0].url}
-                    alt={artist.name}
-                  />
-                </a>
-                <div className="flex flex-col gap-2">
-                  <p className="font-bold">{artist.name}</p>
-                  <p className="text-sm">{artist.followers.total} followers</p>
+              );
+            })}
+          {userTopArtists &&
+            userTopArtists.items.map((artist: any, index: number) => {
+              return (
+                <div key={artist.id} className="flex items-center gap-4">
+                  <p className="font-bold text-customprim">{index + 1}</p>
+                  <a href={artist.external_urls.spotify} target="_blank">
+                    <Image
+                      className="aspect-square object-cover rounded-lg"
+                      width="100"
+                      height="100"
+                      src={artist.images[0].url}
+                      alt={artist.name}
+                    />
+                  </a>
+                  <div className="flex flex-col gap-2">
+                    <p className="font-bold">{artist.name}</p>
+                    <p className="text-sm">
+                      {artist.followers.total} followers
+                    </p>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+        </div>
+        {(userTopTracks || userTopArtists) && (
+          <Button onClick={getMoreItems}>Load More</Button>
+        )}
       </div>
     </main>
   );
