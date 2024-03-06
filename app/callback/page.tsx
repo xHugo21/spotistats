@@ -1,7 +1,8 @@
 "use client";
+
 import { useSearchParams } from "next/navigation";
 import { SPOTIFY_CLIENT_ID, SPOTIFY_REDIRECT_URI } from "../../lib/config";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 
 const Callback = () => {
   const searchParams = useSearchParams();
@@ -53,7 +54,11 @@ const Callback = () => {
     }
   });
 
-  return <div>Callback Page</div>;
+  return (
+    <Suspense>
+      <div>Callback Page</div>
+    </Suspense>
+  );
 };
 
 export default Callback;
