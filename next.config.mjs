@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: "/spotify-clone",
+  basePath: "/spotistats-clone",
   output: "export",
   images: {
     domains: ["i.scdn.co"],
