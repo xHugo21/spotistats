@@ -43,14 +43,22 @@ const Callback = () => {
             localStorage.setItem("expires_at", data.expires_at);
             localStorage.removeItem("code_verifier");
 
-            window.location.href = "/";
+            if (process.env.NODE_ENV === "production") {
+              window.location.href = "/spotistats-clone";
+            } else {
+              window.location.href = "/";
+            }
           });
     };
 
     if (code) {
       exchangeCodeForToken();
     } else {
-      window.location.href = "/";
+      if (process.env.NODE_ENV === "production") {
+        window.location.href = "/spotistats-clone";
+      } else {
+        window.location.href = "/";
+      }
     }
   });
 
