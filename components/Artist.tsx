@@ -33,9 +33,9 @@ export function Artist(props: ArtistProps) {
           unoptimized
         />
       </a>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 w-[200px]">
         <div className="flex gap-2">
-          <p className="font-bold">{artist.name}</p>
+          <p className="font-bold truncate">{artist.name}</p>
           <div className="flex gap-1 items-center">
             <Image
               src={`${BASE_PATH}/assets/bolt.svg`}

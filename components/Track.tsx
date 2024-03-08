@@ -21,8 +21,8 @@ export function Track(props: TrackProps) {
           unoptimized
         />
       </a>
-      <div className="flex flex-col gap-2">
-        <p className="font-bold">{track.name}</p>
+      <div className="flex flex-col gap-2 w-[200px]">
+        <p className="font-bold truncate">{track.name}</p>
         <div className="flex flex-wrap gap-1 w-40">
           {track.artists.map((artist: any, artistIndex: number) => {
             return (
