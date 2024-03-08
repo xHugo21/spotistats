@@ -1,7 +1,11 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { SPOTIFY_CLIENT_ID, SPOTIFY_REDIRECT_URI } from "../../lib/config";
+import {
+  BASE_PATH,
+  SPOTIFY_CLIENT_ID,
+  SPOTIFY_REDIRECT_URI,
+} from "../../lib/config";
 import { Suspense, useEffect } from "react";
 
 const Callback = () => {
@@ -43,22 +47,14 @@ const Callback = () => {
             localStorage.setItem("expires_at", data.expires_at);
             localStorage.removeItem("code_verifier");
 
-            if (process.env.NODE_ENV === "production") {
-              window.location.href = "/spotistats-clone";
-            } else {
-              window.location.href = "/";
-            }
+            window.location.href = BASE_PATH;
           });
     };
 
     if (code) {
       exchangeCodeForToken();
     } else {
-      if (process.env.NODE_ENV === "production") {
-        window.location.href = "/spotistats-clone";
-      } else {
-        window.location.href = "/";
-      }
+      window.location.href = BASE_PATH;
     }
   });
 

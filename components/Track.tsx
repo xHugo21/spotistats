@@ -18,6 +18,7 @@ export function Track(props: TrackProps) {
           height="100"
           src={track.album.images[0].url}
           alt={track.name}
+          unoptimized
         />
       </a>
       <div className="flex flex-col gap-2">

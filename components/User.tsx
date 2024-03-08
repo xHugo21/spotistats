@@ -2,6 +2,8 @@ import { Button } from "./ui/button";
 
 import Image from "next/image";
 
+import { BASE_PATH } from "../lib/config";
+
 interface UserProps {
   userData: any;
 }
@@ -26,6 +28,7 @@ export function User(props: UserProps) {
           src={userData.images[0].url}
           alt="User Profile"
           className="rounded-lg"
+          unoptimized
         />
         <p className="text-lg font-bold">{userData.display_name}</p>
       </div>

@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import { BASE_PATH } from "../lib/config";
+
 interface ArtistProps {
   artist: any;
   index: number;
@@ -28,6 +30,7 @@ export function Artist(props: ArtistProps) {
           height="100"
           src={artist.images[0].url}
           alt={artist.name}
+          unoptimized
         />
       </a>
       <div className="flex flex-col gap-2">
@@ -35,10 +38,11 @@ export function Artist(props: ArtistProps) {
           <p className="font-bold">{artist.name}</p>
           <div className="flex gap-1 items-center">
             <Image
-              src="assets/bolt.svg"
+              src={`${BASE_PATH}/assets/bolt.svg`}
               alt="Bolt icon"
               width="16"
               height="16"
+              unoptimized
             />
             <p className="text-customacc font-bold">{artist.popularity}</p>
           </div>
