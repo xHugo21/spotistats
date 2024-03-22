@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import Image from "next/image";
 
 interface TrackProps {
@@ -9,7 +10,12 @@ export function Track(props: TrackProps) {
   const { track, index } = props;
 
   return (
-    <div className="flex items-center gap-4">
+    <motion.div
+      className="flex items-center gap-4"
+      initial={{ x: 100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.3, delay: 0.2 * (index % 20) }}
+    >
       <p className="font-bold text-customprim">{index + 1}</p>
       <a href={track.external_urls.spotify} target="_blank">
         <Image
@@ -34,6 +40,6 @@ export function Track(props: TrackProps) {
           })}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

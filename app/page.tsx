@@ -1,5 +1,7 @@
 "use client";
 
+import { motion } from "framer-motion";
+
 import { Button } from "../components/ui/button";
 import {
   Select,
@@ -158,30 +160,41 @@ export default function Home() {
   }, [accessToken, topType, timeInterval]);
 
   return (
-    <main className="py-8 px-16 md:py-16 md:px-28 flex justify-center flex-col items-center">
-      <div className="flex flex-col gap-8 md:flex-row md:gap-16 justify-around items-center w-full">
-        <div className="flex md:flex-col gap-4 items-center order-2 md:order-1">
-          <Select onValueChange={setTopType}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="tracks">Tracks</SelectItem>
-              <SelectItem value="artists">Artists</SelectItem>
-            </SelectContent>
-          </Select>
+    <main
+      className={`py-8 px-16 md:py-16 md:px-28 flex justify-center flex-col items-center ${
+        !accessToken ? "h-screen" : ""
+      }`}
+    >
+      <motion.div
+        layout
+        className={`flex flex-col gap-8 justify-around items-center w-full ${
+          accessToken ? "md:flex-row" : ""
+        }`}
+      >
+        {accessToken && (
+          <div className="flex md:flex-col gap-4 items-center order-2 md:order-1">
+            <Select onValueChange={setTopType}>
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="tracks">Tracks</SelectItem>
+                <SelectItem value="artists">Artists</SelectItem>
+              </SelectContent>
+            </Select>
 
-          <Select onValueChange={setTimeInterval}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="Time Interval" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="short_term">4 Weeks</SelectItem>
-              <SelectItem value="medium_term">6 Months</SelectItem>
-              <SelectItem value="long_term">All Time</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+            <Select onValueChange={setTimeInterval}>
+              <SelectTrigger className="w-32">
+                <SelectValue placeholder="Time Interval" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="short_term">4 Weeks</SelectItem>
+                <SelectItem value="medium_term">6 Months</SelectItem>
+                <SelectItem value="long_term">All Time</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
         <h1 className="text-6xl font-bold mb-4 text-center order-1 md:order-2">
           <span className="text-customprim">Hugo&apos;s</span> Spotify Stats
@@ -195,7 +208,7 @@ export default function Home() {
           )}
           {accessToken && userData && <User userData={userData} />}
         </div>
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-32 gap-y-8 mt-16">
         {userTopTracks &&

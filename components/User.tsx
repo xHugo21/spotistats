@@ -1,8 +1,7 @@
-import { Button } from "./ui/button";
-
+import { motion } from "framer-motion";
 import Image from "next/image";
 
-import { BASE_PATH } from "../lib/config";
+import { Button } from "./ui/button";
 
 interface UserProps {
   userData: any;
@@ -13,7 +12,7 @@ export function User(props: UserProps) {
 
   const handleLogout = () => {
     localStorage.clear();
-    window.location.href = "/";
+    window.location.reload();
   };
 
   return (
@@ -21,7 +20,13 @@ export function User(props: UserProps) {
       <Button className="w-32" onClick={handleLogout}>
         Logout
       </Button>
-      <div className="flex flex-col items-center gap-4">
+      <motion.div
+        className="flex flex-col items-center gap-4"
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        exit={{ scale: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
         <Image
           width="100"
           height="100"
@@ -31,7 +36,7 @@ export function User(props: UserProps) {
           unoptimized
         />
         <p className="text-lg font-bold">{userData.display_name}</p>
-      </div>
+      </motion.div>
     </div>
   );
 }
