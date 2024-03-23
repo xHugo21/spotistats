@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Artist } from "../components/Artist";
+import { CustomAlert } from "../components/CustomAlert";
 import { Track } from "../components/Track";
 import { User } from "../components/User";
 
@@ -21,6 +22,7 @@ import {
   generateUrlWithSearchParams,
 } from "../lib/pkce-utils.js";
 import { useState, useEffect } from "react";
+import { error } from "console";
 
 export default function Home() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -29,6 +31,7 @@ export default function Home() {
   const [userData, setUserData] = useState<any>(null);
   const [userTopArtists, setUserTopArtists] = useState<any>(null);
   const [userTopTracks, setUserTopTracks] = useState<any>(null);
+  const [errorResponse, setErrorResponse] = useState<any>(null);
 
   const handleLogin = () => {
     const codeVerifier = generateRandomString(64);
@@ -53,7 +56,7 @@ export default function Home() {
   const getUserData = (access_token: string | null) => {
     fetch("https://api.spotify.com/v1/me", {
       headers: {
-        Authorization: "Bearer " + access_token,
+        Authorization: "Bearr " + access_token,
       },
     })
       .then(async (response) => {
@@ -68,8 +71,7 @@ export default function Home() {
       })
       .catch((error) => {
         localStorage.clear();
-        console.error(error);
-        window.location.href = "/";
+        setErrorResponse(error.error);
       });
   };
 
@@ -109,7 +111,7 @@ export default function Home() {
         }
       })
       .catch((error) => {
-        console.error(error);
+        setErrorResponse(error.error);
       });
   };
 
@@ -144,7 +146,7 @@ export default function Home() {
           }
         })
         .catch((error) => {
-          console.error(error);
+          setErrorResponse(error.error);
         });
     }
 
@@ -165,6 +167,12 @@ export default function Home() {
         !accessToken ? "h-screen" : ""
       }`}
     >
+      {errorResponse && (
+        <CustomAlert
+          title={errorResponse.status}
+          description={errorResponse.message}
+        />
+      )}
       <motion.div
         layout
         className={`flex flex-col gap-8 justify-around items-center w-full ${

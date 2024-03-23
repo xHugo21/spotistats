@@ -60,7 +60,9 @@ const Callback = () => {
 
   return (
     <Suspense>
-      <div>Callback Page</div>
+      <div className="h-screen w-full flex justify-center items-center">
+        <p className="font-bold text-6xl text-customprim">Fetching user...</p>
+      </div>
     </Suspense>
   );
 };
