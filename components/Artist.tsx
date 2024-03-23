@@ -31,15 +31,15 @@ export function Artist(props: ArtistProps) {
       <p className="font-bold text-customprim">{index + 1}</p>
       <a href={artist.external_urls.spotify} target="_blank">
         <Image
-          className="aspect-square object-cover rounded-lg"
           width="100"
           height="100"
+          className="aspect-square object-cover rounded-lg min-w-[100px]"
           src={artist.images[0].url}
           alt={artist.name}
           unoptimized
         />
       </a>
-      <div className="flex flex-col gap-2 w-[200px]">
+      <div className="flex flex-col gap-2 min-w-[150px] md:min-w-[200px]">
         <div className="flex gap-2">
           <p className="font-bold truncate">{artist.name}</p>
           <div className="flex gap-1 items-center">

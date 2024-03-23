@@ -56,7 +56,7 @@ export default function Home() {
   const getUserData = (access_token: string | null) => {
     fetch("https://api.spotify.com/v1/me", {
       headers: {
-        Authorization: "Bearr " + access_token,
+        Authorization: "Bearer " + access_token,
       },
     })
       .then(async (response) => {

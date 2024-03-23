@@ -19,7 +19,7 @@ export function Track(props: TrackProps) {
       <p className="font-bold text-customprim">{index + 1}</p>
       <a href={track.external_urls.spotify} target="_blank">
         <Image
-          className="aspect-square object-cover rounded-lg"
+          className="aspect-square object-cover rounded-lg min-w-[100px]"
           width="100"
           height="100"
           src={track.album.images[0].url}
@@ -27,7 +27,7 @@ export function Track(props: TrackProps) {
           unoptimized
         />
       </a>
-      <div className="flex flex-col gap-2 w-[200px]">
+      <div className="flex flex-col gap-2 min-w-[150px] md:min-w-[200px]">
         <p className="font-bold truncate">{track.name}</p>
         <div className="flex flex-wrap gap-1 w-40">
           {track.artists.map((artist: any, artistIndex: number) => {
