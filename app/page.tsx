@@ -163,7 +163,7 @@ export default function Home() {
 
   return (
     <main
-      className={`py-8 px-16 md:py-16 md:px-28 flex justify-center flex-col items-center ${
+      className={`py-8 px-8 md:py-16 md:px-28 flex justify-center flex-col items-center ${
         !accessToken ? "h-screen" : ""
       }`}
     >

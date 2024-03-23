@@ -23,9 +23,9 @@ export function Artist(props: ArtistProps) {
 
   return (
     <motion.div
-      className="flex items-center gap-4"
-      initial={{ x: 100, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
+      className="flex items-center gap-4 w-100"
+      initial={{ y: 50, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3, delay: 0.2 * (index % 20) }}
     >
       <p className="font-bold text-customprim">{index + 1}</p>
@@ -39,7 +39,7 @@ export function Artist(props: ArtistProps) {
           unoptimized
         />
       </a>
-      <div className="flex flex-col gap-2 min-w-[150px] md:min-w-[200px]">
+      <div className="flex flex-col gap-2 w-auto">
         <div className="flex gap-2">
           <p className="font-bold truncate">{artist.name}</p>
           <div className="flex gap-1 items-center">
