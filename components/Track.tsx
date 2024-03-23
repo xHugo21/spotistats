@@ -1,13 +1,16 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 
+import { BASE_PATH } from "../lib/config";
+
 interface TrackProps {
   track: any;
   index: number;
+  isExplicit: boolean;
 }
 
 export function Track(props: TrackProps) {
-  const { track, index } = props;
+  const { track, index, isExplicit } = props;
 
   return (
     <motion.div
@@ -28,14 +31,32 @@ export function Track(props: TrackProps) {
         />
       </a>
       <div className="flex flex-col gap-2 max-w-[120px] md:max-w-[200px]">
-        <p className="font-bold truncate">{track.name}</p>
+        <div className="flex gap-1 items-center">
+          <p className="font-bold truncate">{track.name}</p>
+          {isExplicit && (
+            <Image
+              src={`${BASE_PATH}/assets/explicit.png`}
+              alt="Explicit Icon"
+              width="16"
+              height="16"
+              unoptimized
+            />
+          )}
+        </div>
         <div className="flex flex-wrap gap-1 truncate">
           {track.artists.map((artist: any, artistIndex: number) => {
             return (
-              <p key={artist.id} className="text-sm">
-                {artist.name}
-                {artistIndex !== track.artists.length - 1 && ","}
-              </p>
+              <a
+                key={artist.id}
+                href={artist.external_urls.spotify}
+                target="_blank"
+                className="cursor-pointer hover:underline"
+              >
+                <p className="text-sm">
+                  {artist.name}
+                  {artistIndex !== track.artists.length - 1 && ","}
+                </p>
+              </a>
             );
           })}
         </div>

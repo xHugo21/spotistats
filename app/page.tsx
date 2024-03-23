@@ -221,7 +221,14 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-32 gap-y-8 mt-16">
         {userTopTracks &&
           userTopTracks.items.map((track: any, index: number) => {
-            return <Track key={track.id} track={track} index={index} />;
+            return (
+              <Track
+                key={track.id}
+                track={track}
+                index={index}
+                isExplicit={track.explicit ? true : false}
+              />
+            );
           })}
         {userTopArtists &&
           userTopArtists.items.map((artist: any, index: number) => {
