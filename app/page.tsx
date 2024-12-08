@@ -1,15 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "../components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Artist } from "../components/Artist";
 import { CustomAlert } from "../components/CustomAlert";
 import { Track } from "../components/Track";
@@ -22,12 +15,11 @@ import {
   generateUrlWithSearchParams,
 } from "../lib/pkce-utils.js";
 import { useState, useEffect } from "react";
-import { error } from "console";
 
 export default function Home() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [timeInterval, setTimeInterval] = useState<any>(null);
-  const [topType, setTopType] = useState<any>(null);
+  const [timeInterval, setTimeInterval] = useState<string>("short_term");
+  const [topType, setTopType] = useState<string>("tracks");
   const [userData, setUserData] = useState<any>(null);
   const [userTopArtists, setUserTopArtists] = useState<any>(null);
   const [userTopTracks, setUserTopTracks] = useState<any>(null);
@@ -48,7 +40,7 @@ export default function Home() {
           code_challenge_method: "S256",
           code_challenge,
           redirect_uri: SPOTIFY_REDIRECT_URI,
-        }
+        },
       );
     });
   };
@@ -90,7 +82,7 @@ export default function Home() {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("access_token"),
         },
-      }
+      },
     )
       .then(async (response) => {
         if (response.ok) {
@@ -127,7 +119,7 @@ export default function Home() {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("access_token"),
           },
-        }
+        },
       )
         .then(async (response) => {
           if (response.ok) {
@@ -180,35 +172,29 @@ export default function Home() {
         }`}
       >
         {accessToken && (
-          <div className="flex md:flex-col gap-4 items-center order-2 md:order-1">
-            <Select onValueChange={setTopType}>
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="tracks">Tracks</SelectItem>
-                <SelectItem value="artists">Artists</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex flex-col items-center gap-6">
+            <Tabs defaultValue="tracks" onValueChange={setTopType}>
+              <TabsList>
+                <TabsTrigger value="tracks">Tracks</TabsTrigger>
+                <TabsTrigger value="artists">Artists</TabsTrigger>
+              </TabsList>
+            </Tabs>
 
-            <Select onValueChange={setTimeInterval}>
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="Time Interval" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="short_term">4 Weeks</SelectItem>
-                <SelectItem value="medium_term">6 Months</SelectItem>
-                <SelectItem value="long_term">All Time</SelectItem>
-              </SelectContent>
-            </Select>
+            <Tabs defaultValue="short_term" onValueChange={setTimeInterval}>
+              <TabsList>
+                <TabsTrigger value="short_term">4 Weeks</TabsTrigger>
+                <TabsTrigger value="medium_term">6 Months</TabsTrigger>
+                <TabsTrigger value="long_term">All Time</TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
         )}
 
-        <h1 className="text-6xl font-bold mb-4 text-center order-1 md:order-2">
+        <h1 className="text-6xl font-bold mb-4 text-center">
           <span className="text-customprim">Hugo&apos;s</span> Spotify Stats
         </h1>
 
-        <div className="flex flex-col gap-4 items-center order-3">
+        <div className="flex flex-col gap-4 items-center">
           {!accessToken && (
             <Button className="w-32" onClick={handleLogin}>
               Login
