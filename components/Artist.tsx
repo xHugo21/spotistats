@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { Zap } from "lucide-react";
 
 import { BASE_PATH } from "../lib/config";
 
@@ -43,13 +44,7 @@ export function Artist(props: ArtistProps) {
         <div className="flex gap-2">
           <p className="font-bold truncate">{artist.name}</p>
           <div className="flex gap-1 items-center">
-            <Image
-              src={`${BASE_PATH}/assets/bolt.svg`}
-              alt="Bolt icon"
-              width="16"
-              height="16"
-              unoptimized
-            />
+            <Zap size={16} color="#dbdf6b" />
             <p className="text-customacc font-bold">{artist.popularity}</p>
           </div>
         </div>
