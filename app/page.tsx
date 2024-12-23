@@ -19,143 +19,21 @@ import {
   generateUrlWithSearchParams,
 } from "../lib/pkce-utils.ts";
 import { useState, useEffect } from "react";
+import useSpotifyAuth from "../hooks/useSpotifyAuth";
+import useSpotifyData from "../hooks/useSpotifyData";
 
 export default function Home() {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [timeInterval, setTimeInterval] = useState<string>("short_term");
   const [topType, setTopType] = useState<string>("tracks");
-  const [userData, setUserData] = useState<any>(null);
-  const [userTopArtists, setUserTopArtists] = useState<any>(null);
-  const [userTopTracks, setUserTopTracks] = useState<any>(null);
-  const [errorResponse, setErrorResponse] = useState<any>(null);
 
-  const handleLogin = () => {
-    const codeVerifier = generateRandomString(64);
-
-    generateCodeChallenge(codeVerifier).then((code_challenge) => {
-      window.localStorage.setItem("code_verifier", codeVerifier);
-
-      window.location.href = generateUrlWithSearchParams(
-        "https://accounts.spotify.com/authorize",
-        {
-          response_type: "code",
-          client_id: SPOTIFY_CLIENT_ID,
-          scope: "user-read-private user-read-email user-top-read",
-          code_challenge_method: "S256",
-          code_challenge,
-          redirect_uri: SPOTIFY_REDIRECT_URI,
-        },
-      );
-    });
-  };
-
-  const getUserData = (access_token: string | null) => {
-    fetch("https://api.spotify.com/v1/me", {
-      headers: {
-        Authorization: "Bearer " + access_token,
-      },
-    })
-      .then(async (response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw await response.json();
-        }
-      })
-      .then((data) => {
-        setUserData(data);
-      })
-      .catch((error) => {
-        localStorage.clear();
-        setErrorResponse(error.error);
-      });
-  };
-
-  const getMoreItems = () => {
-    fetch(
-      `https://api.spotify.com/v1/me/top/${topType}?` +
-        new URLSearchParams({
-          time_range: timeInterval,
-          limit: ITEMS_PER_PAGE,
-          offset:
-            topType === "tracks"
-              ? userTopTracks.items.length
-              : userTopArtists.items.length,
-        }),
-      {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("access_token"),
-        },
-      },
-    )
-      .then(async (response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw await response.json();
-        }
-      })
-      .then((data) => {
-        if (topType === "tracks") {
-          setUserTopTracks({
-            items: userTopTracks.items.concat(data.items),
-          });
-        } else {
-          setUserTopArtists({
-            items: userTopArtists.items.concat(data.items),
-          });
-        }
-      })
-      .catch((error) => {
-        setErrorResponse(error.error);
-      });
-  };
-
-  useEffect(() => {
-    function getTopItems() {
-      fetch(
-        `https://api.spotify.com/v1/me/top/${topType}?` +
-          new URLSearchParams({
-            time_range: timeInterval,
-            limit: ITEMS_PER_PAGE,
-          }),
-        {
-          headers: {
-            Authorization: "Bearer " + localStorage.getItem("access_token"),
-          },
-        },
-      )
-        .then(async (response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw await response.json();
-          }
-        })
-        .then((data) => {
-          if (topType === "tracks") {
-            setUserTopArtists(null);
-            setUserTopTracks(data);
-          } else {
-            setUserTopTracks(null);
-            setUserTopArtists(data);
-          }
-        })
-        .catch((error) => {
-          setErrorResponse(error.error);
-        });
-    }
-
-    setAccessToken(localStorage.getItem("access_token"));
-
-    if (accessToken) {
-      getUserData(accessToken);
-    }
-
-    if (accessToken && topType && timeInterval) {
-      getTopItems();
-    }
-  }, [accessToken, topType, timeInterval]);
+  const { accessToken, handleLogin } = useSpotifyAuth();
+  const {
+    userData,
+    userTopTracks,
+    userTopArtists,
+    errorResponse,
+    loadMoreItems,
+  } = useSpotifyData(accessToken, topType, timeInterval);
 
   return (
     <main
@@ -226,7 +104,7 @@ export default function Home() {
           })}
       </div>
       {(userTopTracks || userTopArtists) && (
-        <Button className="w-32 mt-16" onClick={getMoreItems}>
+        <Button className="w-32 mt-16" onClick={loadMoreItems}>
           Load More
         </Button>
       )}
