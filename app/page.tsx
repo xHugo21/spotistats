@@ -8,17 +8,7 @@ import { CustomAlert } from "../components/CustomAlert";
 import { Track } from "../components/Track";
 import { User } from "../components/User";
 
-import {
-  SPOTIFY_CLIENT_ID,
-  SPOTIFY_REDIRECT_URI,
-  ITEMS_PER_PAGE,
-} from "../lib/config";
-import {
-  generateRandomString,
-  generateCodeChallenge,
-  generateUrlWithSearchParams,
-} from "../lib/pkce-utils.ts";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useSpotifyAuth from "../hooks/useSpotifyAuth";
 import useSpotifyData from "../hooks/useSpotifyData";
 
