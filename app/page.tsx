@@ -8,12 +8,16 @@ import { CustomAlert } from "../components/CustomAlert";
 import { Track } from "../components/Track";
 import { User } from "../components/User";
 
-import { SPOTIFY_CLIENT_ID, SPOTIFY_REDIRECT_URI } from "../lib/config";
+import {
+  SPOTIFY_CLIENT_ID,
+  SPOTIFY_REDIRECT_URI,
+  ITEMS_PER_PAGE,
+} from "../lib/config";
 import {
   generateRandomString,
   generateCodeChallenge,
   generateUrlWithSearchParams,
-} from "../lib/pkce-utils.js";
+} from "../lib/pkce-utils.ts";
 import { useState, useEffect } from "react";
 
 export default function Home() {
@@ -72,7 +76,7 @@ export default function Home() {
       `https://api.spotify.com/v1/me/top/${topType}?` +
         new URLSearchParams({
           time_range: timeInterval,
-          limit: "20",
+          limit: ITEMS_PER_PAGE,
           offset:
             topType === "tracks"
               ? userTopTracks.items.length
@@ -113,7 +117,7 @@ export default function Home() {
         `https://api.spotify.com/v1/me/top/${topType}?` +
           new URLSearchParams({
             time_range: timeInterval,
-            limit: "20",
+            limit: ITEMS_PER_PAGE,
           }),
         {
           headers: {

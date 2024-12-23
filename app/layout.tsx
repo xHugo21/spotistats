@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Spotistats Hugo",
-  description: "Spotistats clone built with Next.js and shadcn",
+  description: "Spotistats built with Next.js and shadcn",
 };
 
 export default function RootLayout({
