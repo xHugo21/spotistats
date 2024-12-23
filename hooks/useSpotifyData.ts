@@ -20,7 +20,7 @@ const useSpotifyData = (
         const data = await getUserData(accessToken);
         setUserData(data);
       } catch (error) {
-        setErrorResponse(error.error);
+        setErrorResponse((error as any).error);
         localStorage.clear();
       }
     };
@@ -41,7 +41,7 @@ const useSpotifyData = (
           setUserTopTracks(null);
         }
       } catch (error) {
-        setErrorResponse(error.error);
+        setErrorResponse((error as any).error);
       }
     };
 
@@ -70,7 +70,7 @@ const useSpotifyData = (
         });
       }
     } catch (error) {
-      setErrorResponse(error.error);
+      setErrorResponse((error as any).error);
     }
   };
 

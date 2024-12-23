@@ -1,4 +1,4 @@
-export function generateRandomString(length) {
+export function generateRandomString(length: number): string {
   let text = "";
   const possible =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -9,10 +9,12 @@ export function generateRandomString(length) {
   return text;
 }
 
-export async function generateCodeChallenge(codeVerifier) {
+export async function generateCodeChallenge(
+  codeVerifier: string,
+): Promise<string> {
   const digest = await crypto.subtle.digest(
     "SHA-256",
-    new TextEncoder().encode(codeVerifier)
+    new TextEncoder().encode(codeVerifier),
   );
 
   return btoa(String.fromCharCode(...new Uint8Array(digest)))
@@ -21,7 +23,7 @@ export async function generateCodeChallenge(codeVerifier) {
     .replace(/\//g, "_");
 }
 
-export function generateUrlWithSearchParams(url, params) {
+export function generateUrlWithSearchParams(url: string, params: any): string {
   const urlObject = new URL(url);
   urlObject.search = new URLSearchParams(params).toString();
 
