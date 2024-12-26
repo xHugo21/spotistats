@@ -35,7 +35,7 @@ const useSpotifyCallback = () => {
                   "application/x-www-form-urlencoded;charset=UTF-8",
               },
               body: new URLSearchParams({
-                client_id: SPOTIFY_CLIENT_ID,
+                client_id: SPOTIFY_CLIENT_ID ?? "",
                 grant_type: "authorization_code",
                 code,
                 redirect_uri: SPOTIFY_REDIRECT_URI,
